@@ -51,21 +51,24 @@ public class SymbolPlayer {
     public void play(Symbol symbol, int beatsPerMinute) {
         if (symbol instanceof BreakSymbol) {
             BreakSymbol breakSymbol = (BreakSymbol) symbol;
-            try {
-                Thread.sleep(breakSymbol.getNoteLength().toMilliseconds(beatsPerMinute));
-            } catch (InterruptedException e) {
-                // TODO fw exception
-                e.printStackTrace();
-            }
+
+            sleep(breakSymbol.getNoteLength().toMilliseconds(beatsPerMinute));
         } else if (symbol instanceof NoteSymbol) {
             NoteSymbol noteSymbol = (NoteSymbol) symbol;
+            long millis = 0;
 
             for (NoteName noteName : noteSymbol.getNoteNamesSorted()) {
                 playNote(noteName, NoteEventToMidiEventConverter.DEFAULT_NOISE);
+
+                long temp = noteSymbol.getNoteLength(noteName).toMilliseconds(beatsPerMinute);
+
+                if (temp > millis) {
+                    millis = temp;
+                }
             }
 
-            // TODO fw sleep
             // TODO fw sollen alle Symbole genau eine NoteLength haben?
+            sleep(millis);
 
             for (NoteName noteName : noteSymbol.getNoteNamesSorted()) {
                 playNote(noteName, NoteEventToMidiEventConverter.DEFAULT_SILENT);
@@ -85,5 +88,12 @@ public class SymbolPlayer {
         msg[2] = (byte) velocity;
 
         midiDriver.queueEvent(msg);
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+        }
     }
 }
