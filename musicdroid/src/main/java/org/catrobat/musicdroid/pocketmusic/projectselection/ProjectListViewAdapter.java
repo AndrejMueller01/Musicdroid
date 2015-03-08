@@ -39,7 +39,7 @@ import org.catrobat.musicdroid.pocketmusic.R;
 import org.catrobat.musicdroid.pocketmusic.error.ErrorDialog;
 import org.catrobat.musicdroid.pocketmusic.note.Project;
 import org.catrobat.musicdroid.pocketmusic.note.midi.MidiException;
-import org.catrobat.musicdroid.pocketmusic.note.midi.MidiPlayer;
+import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectPlayer;
 import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectToMidiConverter;
 
 import java.io.IOException;
@@ -180,10 +180,9 @@ public class ProjectListViewAdapter extends BaseAdapter {
 
                     // TODO consider more tracks
                     try {
-                        MidiPlayer.getInstance().playTrack(activity,
+                        ProjectPlayer.getInstance().play(activity,
                                 activity.getCacheDir(),
-                                projects.get(position).getTrack(0),
-                                projects.get(position).getBeatsPerMinute());
+                                projects.get(position));
                     } catch (IOException | MidiException e) {
                         ErrorDialog.createDialog(R.string.midi_open, e).show(activity.getFragmentManager(), "tag");
                     }
@@ -198,7 +197,7 @@ public class ProjectListViewAdapter extends BaseAdapter {
             public void onClick(View view) {
                 projectSelectionTrackIsPlayingFlags.set(position, false);
                 playButtonLock = false;
-                MidiPlayer.getInstance().stop();
+                ProjectPlayer.getInstance().stop();
                 notifyDataSetChanged();
             }
 

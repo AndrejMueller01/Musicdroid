@@ -31,7 +31,7 @@ import org.catrobat.musicdroid.pocketmusic.R;
 import org.catrobat.musicdroid.pocketmusic.instrument.piano.PianoActivity;
 import org.catrobat.musicdroid.pocketmusic.note.Project;
 import org.catrobat.musicdroid.pocketmusic.note.midi.MidiException;
-import org.catrobat.musicdroid.pocketmusic.note.midi.MidiPlayer;
+import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectPlayer;
 import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectToMidiConverter;
 import org.catrobat.musicdroid.pocketmusic.projectselection.ProjectSelectionActivity;
 import org.catrobat.musicdroid.pocketmusic.test.note.ProjectTestDataFactory;
@@ -44,7 +44,7 @@ import java.util.ArrayList;
 public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestCase2<ProjectSelectionActivity> {
 
     private static final int NUMBER_OF_SAMPLE_PROJECTS = 10;
-    private MidiPlayer midiplayer = MidiPlayer.getInstance();
+    private ProjectPlayer midiplayer = ProjectPlayer.getInstance();
 
     private Solo solo;
     private static final String FILE_NAME = "TestProject";

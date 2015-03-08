@@ -36,8 +36,8 @@ import org.catrobat.musicdroid.pocketmusic.note.NoteEvent;
 import org.catrobat.musicdroid.pocketmusic.note.Project;
 import org.catrobat.musicdroid.pocketmusic.note.Track;
 import org.catrobat.musicdroid.pocketmusic.note.TrackMementoStack;
-import org.catrobat.musicdroid.pocketmusic.note.midi.MidiPlayer;
 import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectToMidiConverter;
+import org.catrobat.musicdroid.pocketmusic.note.midi.TrackPlayer;
 import org.catrobat.musicdroid.pocketmusic.note.symbol.BreakSymbol;
 import org.catrobat.musicdroid.pocketmusic.note.symbol.Symbol;
 import org.catrobat.musicdroid.pocketmusic.note.symbol.SymbolsToTrackConverter;
@@ -46,7 +46,6 @@ import org.catrobat.musicdroid.pocketmusic.projectselection.dialog.SaveProjectDi
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 public abstract class InstrumentActivity extends FragmentActivity {
 
@@ -56,7 +55,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
     private static final String SAVED_INSTANCE_TRACK = "SavedTrack";
     private static final String SAVED_INSTANCE_MEMENTO = "SavedMemento";
 
-    private MidiPlayer midiPlayer;
+    private TrackPlayer trackPlayer;
     private Track track;
     private List<Symbol> symbols;
     private TrackToSymbolsConverter trackConverter;
@@ -66,7 +65,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
     private boolean activityInFocus = false;
 
     public InstrumentActivity(MusicalKey key, MusicalInstrument instrument) {
-        midiPlayer = MidiPlayer.getInstance();
+        trackPlayer = TrackPlayer.getInstance();
 
         track = new Track(key, instrument, Project.DEFAULT_BEATS_PER_MINUTE);
         symbols = new LinkedList<Symbol>();
@@ -98,7 +97,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
     public void onPause() {
         super.onPause();
 
-        midiPlayer.stop();
+        trackPlayer.stop();
     }
 
     @Override
@@ -121,10 +120,8 @@ public abstract class InstrumentActivity extends FragmentActivity {
         return track;
     }
 
-    public List<Symbol> getSymbols() { return symbols; }
-
-    public MidiPlayer getMidiPlayer() {
-        return midiPlayer;
+    public List<Symbol> getSymbols() {
+        return symbols;
     }
 
     public void addNoteEvent(NoteEvent noteEvent) {
@@ -135,8 +132,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
         if (noteEvent.isNoteOn()) {
             mementoStack.pushMemento(track);
 
-            int midiResourceId = getResources().getIdentifier(noteEvent.getNoteName().toString().toLowerCase(Locale.getDefault()), R_RAW, getPackageName());
-            midiPlayer.playNote(this, midiResourceId);
+            // TODO fw midiplayer
             tickProvider.startCounting();
         } else {
             tickProvider.stopCounting();
@@ -170,7 +166,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        midiPlayer.stop();
+        trackPlayer.stop();
 
         if (id == R.id.action_save_midi) {
             onActionSaveMidi();
@@ -182,14 +178,14 @@ public abstract class InstrumentActivity extends FragmentActivity {
             onActionDeleteMidi();
             return true;
         } else if (id == R.id.action_play_and_stop_midi) {
-            if(!getMidiPlayer().isPlaying()) {
-                item.setIcon(R.drawable.ic_action_stop);
-                item.setTitle(R.string.action_stop_midi);
-                onActionPlayMidi();
-            } else {
+            if (trackPlayer.isPlaying()) {
                 item.setIcon(R.drawable.ic_action_play);
                 item.setTitle(R.string.action_play_midi);
                 onActionStopMidi();
+            } else {
+                item.setIcon(R.drawable.ic_action_stop);
+                item.setTitle(R.string.action_stop_midi);
+                onActionPlayMidi();
             }
             return true;
         }
@@ -222,7 +218,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
         }
 
         try {
-            midiPlayer.playTrack(this, getCacheDir(), track, Project.DEFAULT_BEATS_PER_MINUTE);
+            trackPlayer.play(this, getCacheDir(), track, Project.DEFAULT_BEATS_PER_MINUTE);
             ToastDisplayer.showPlayToast(getBaseContext());
         } catch (Exception e) {
             ErrorDialog.createDialog(R.string.action_play_midi_error, e).show(getFragmentManager(), "tag");
@@ -230,7 +226,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
     }
 
     private void onActionStopMidi() {
-        midiPlayer.stop();
+        trackPlayer.stop();
         ToastDisplayer.showStopToast(getBaseContext());
     }
 
@@ -265,8 +261,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
         super.onStop();
 
         if (!activityInFocus) {
-            midiPlayer.stop();
-            midiPlayer.clearPlayQueue();
+            trackPlayer.stop();
         }
     }
 

@@ -83,8 +83,13 @@ public class ProjectTestDataFactory {
         return project;
     }
 
+    public static Project createProjectWithOneSimpleTrack() {
+        return createProjectWithOneSimpleTrack("SomeName");
+    }
+
     public static ArrayList<File> getProjectFilesInStorage() {
         ArrayList<File> projectFiles = new ArrayList<>();
+
         if (ProjectToMidiConverter.MIDI_FOLDER.isDirectory()) {
             Collections.addAll(projectFiles, ProjectToMidiConverter.MIDI_FOLDER.listFiles());
         }
@@ -95,9 +100,13 @@ public class ProjectTestDataFactory {
     public static boolean checkIfProjectInStorage(String projectName) {
         String fileName = projectName + ProjectToMidiConverter.MIDI_FILE_EXTENSION;
         ArrayList<File> projects = getProjectFilesInStorage();
-        for (int i = 0; i < projects.size(); i++)
-            if (projects.get(i).getName().equals(fileName))
+
+        for (int i = 0; i < projects.size(); i++) {
+            if (projects.get(i).getName().equals(fileName)) {
                 return true;
+            }
+        }
+
         return false;
     }
 }

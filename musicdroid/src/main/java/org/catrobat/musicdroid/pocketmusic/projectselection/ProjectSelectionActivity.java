@@ -24,7 +24,6 @@
 package org.catrobat.musicdroid.pocketmusic.projectselection;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ActionMode;
@@ -35,7 +34,7 @@ import android.widget.Toast;
 import org.catrobat.musicdroid.pocketmusic.R;
 import org.catrobat.musicdroid.pocketmusic.error.ErrorDialog;
 import org.catrobat.musicdroid.pocketmusic.note.midi.MidiException;
-import org.catrobat.musicdroid.pocketmusic.note.midi.MidiPlayer;
+import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectPlayer;
 import org.catrobat.musicdroid.pocketmusic.projectselection.dialog.AboutDialog;
 import org.catrobat.musicdroid.pocketmusic.projectselection.io.IOHandler;
 import org.catrobat.musicdroid.pocketmusic.projectselection.io.ImportProjectHandler;
@@ -134,7 +133,7 @@ public class ProjectSelectionActivity extends Activity {
     }
 
     public void stopPlayingTracks() {
-        MidiPlayer.getInstance().stop();
+        ProjectPlayer.getInstance().stop();
         notifyTrackPlayed();
     }
 

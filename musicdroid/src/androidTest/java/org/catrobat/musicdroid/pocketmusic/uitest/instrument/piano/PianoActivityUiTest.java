@@ -34,6 +34,7 @@ import org.catrobat.musicdroid.pocketmusic.instrument.piano.PianoActivity;
 import org.catrobat.musicdroid.pocketmusic.note.Project;
 import org.catrobat.musicdroid.pocketmusic.note.Track;
 import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectToMidiConverter;
+import org.catrobat.musicdroid.pocketmusic.note.midi.TrackPlayer;
 
 import java.io.File;
 
@@ -61,7 +62,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
                 file.delete();
         }
 
-        pianoActivity.getMidiPlayer().stop();
+        TrackPlayer.getInstance().stop();
 
         solo.finishOpenedActivities();
     }
@@ -130,7 +131,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
         clickSomePianoButtonsForLargeTrack();
         solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
         Thread.sleep(100);
-        assertTrue(pianoActivity.getMidiPlayer().isPlaying());
+        assertTrue(TrackPlayer.getInstance().isPlaying());
     }
 
     public void testPlayButtonShown() {
@@ -155,7 +156,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
         solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
         solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
         solo.waitForText(pianoActivity.getString(R.string.action_midi_stopped));
-        assertFalse(pianoActivity.getMidiPlayer().isPlaying());
+        assertFalse(TrackPlayer.getInstance().isPlaying());
     }
 
     private void clickSomePianoButtonsForLargeTrack() {
@@ -169,7 +170,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
     public void testPlayMidiEmptyTrack() {
         solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
 
-        assertFalse(pianoActivity.getMidiPlayer().isPlaying());
+        assertFalse(TrackPlayer.getInstance().isPlaying());
     }
 
     public void testPlayMidiFinishedPlaying() throws InterruptedException {
@@ -178,7 +179,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
         solo.waitForDialogToOpen();
         solo.waitForDialogToClose();
 
-        assertFalse(pianoActivity.getMidiPlayer().isPlaying());
+        assertFalse(TrackPlayer.getInstance().isPlaying());
     }
 
     public void testClickOnButtonMaxTrackSize() {
