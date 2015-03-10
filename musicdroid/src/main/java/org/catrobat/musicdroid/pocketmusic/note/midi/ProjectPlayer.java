@@ -45,6 +45,7 @@ public class ProjectPlayer {
 
     protected ProjectPlayer() {}
 
+    // TODO fw tests
     public static ProjectPlayer getInstance() {
         if (null == instance) {
             instance = new ProjectPlayer();

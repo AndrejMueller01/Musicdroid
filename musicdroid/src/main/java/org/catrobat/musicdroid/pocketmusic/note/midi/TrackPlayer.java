@@ -41,6 +41,7 @@ public class TrackPlayer {
         this.projectPlayer = projectPlayer;
     }
 
+    // TODO fw tests
     public static TrackPlayer getInstance() {
         if (null == instance) {
             instance = new TrackPlayer(ProjectPlayer.getInstance());

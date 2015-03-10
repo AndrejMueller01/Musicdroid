@@ -58,7 +58,7 @@ public class SymbolPlayer {
             long millis = 0;
 
             for (NoteName noteName : noteSymbol.getNoteNamesSorted()) {
-                playNote(noteName, NoteEventToMidiEventConverter.DEFAULT_NOISE);
+                playNote(noteName);
 
                 long temp = noteSymbol.getNoteLength(noteName).toMilliseconds(beatsPerMinute);
 
@@ -71,13 +71,17 @@ public class SymbolPlayer {
             sleep(millis);
 
             for (NoteName noteName : noteSymbol.getNoteNamesSorted()) {
-                playNote(noteName, NoteEventToMidiEventConverter.DEFAULT_SILENT);
+                stopNote(noteName);
             }
         }
     }
 
-    private void playNote(NoteName noteName, int velocity) {
-        sendMidi(0, noteName.getMidi(), velocity);
+    public void playNote(NoteName noteName) {
+        sendMidi(0, noteName.getMidi(), NoteEventToMidiEventConverter.DEFAULT_NOISE);
+    }
+
+    public void stopNote(NoteName noteName) {
+        sendMidi(0, noteName.getMidi(), NoteEventToMidiEventConverter.DEFAULT_SILENT);
     }
 
     // TODO fw was is m

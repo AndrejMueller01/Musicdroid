@@ -38,6 +38,7 @@ import org.catrobat.musicdroid.pocketmusic.note.Track;
 import org.catrobat.musicdroid.pocketmusic.note.midi.MidiException;
 import org.catrobat.musicdroid.pocketmusic.note.midi.MidiToProjectConverter;
 import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectToMidiConverter;
+import org.catrobat.musicdroid.pocketmusic.note.midi.SymbolPlayer;
 import org.catrobat.musicdroid.pocketmusic.note.midi.TrackPlayer;
 import org.catrobat.musicdroid.pocketmusic.note.symbol.BreakSymbol;
 import org.catrobat.musicdroid.pocketmusic.note.symbol.NoteEventsToSymbolsConverter;
@@ -63,6 +64,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
 
     private int beatsPerMinute;
     private TrackPlayer trackPlayer;
+    private SymbolPlayer symbolPlayer;
     private Project project;
     private SymbolContainer symbolContainer;
     private NoteEventsToSymbolsConverter noteEventsConverter;
@@ -74,6 +76,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
         // TODO fw consider other BPM
         beatsPerMinute = Project.DEFAULT_BEATS_PER_MINUTE;
         trackPlayer = TrackPlayer.getInstance();
+        symbolPlayer = SymbolPlayer.getInstance();
         project = null;
         symbolContainer = new SymbolContainer(key, instrument);
         noteEventsConverter = new NoteEventsToSymbolsConverter();
@@ -139,10 +142,11 @@ public abstract class InstrumentActivity extends FragmentActivity {
         }
 
         if (noteEvent.isNoteOn()) {
-            // TODO fw midiplayer
             tickProvider.startCounting();
+            symbolPlayer.playNote(noteEvent.getNoteName());
         } else {
             tickProvider.stopCounting();
+            symbolPlayer.stopNote(noteEvent.getNoteName());
         }
 
         symbolContainer.addAll(noteEventsConverter.convertNoteEvent(tickProvider.getTick(), noteEvent, beatsPerMinute));
