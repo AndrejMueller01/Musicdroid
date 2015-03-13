@@ -195,7 +195,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
         clickDeleteInEditMode();
 
         assertFalse(PianoActivity.inCallback);
-        assertEquals(0, pianoActivity.getNoteSheetViewFragment().getSymbols().size());
+        assertEquals(0, pianoActivity.getSymbolContainer().size());
         assertEquals(0, pianoActivity.getSymbolContainer().getMarkedSymbolCount());
     }
 
@@ -205,7 +205,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
 
         solo.clickOnActionBarItem(R.id.action_undo_midi);
 
-        assertEquals(0, pianoActivity.getNoteSheetViewFragment().getSymbols().size());
+        assertEquals(0, pianoActivity.getSymbolContainer().size());
     }
 
     private void enterEditModeWithOneMarkedSymbol() {
@@ -213,7 +213,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
 
         solo.sleep(1000);
 
-        pianoActivity.getNoteSheetViewFragment().getSymbols().get(0).setMarked(true);
+        pianoActivity.getSymbolContainer().get(0).setMarked(true);
         solo.clickLongOnView(pianoActivity.getNoteSheetView());
     }
 
