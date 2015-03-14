@@ -31,14 +31,14 @@ import org.catrobat.musicdroid.pocketmusic.note.NoteEvent;
 
 public class NoteEventToMidiEventConverter {
 
-	public static final int DEFAULT_NOISE = 64;
+    public static final int DEFAULT_NOISE = 64;
     public static final int DEFAULT_SILENT = 0;
 
-	public ChannelEvent convertNoteEvent(long tick, NoteEvent noteEvent, int channel) {
-		if (noteEvent.isNoteOn()) {
-			return new NoteOn(tick, channel, noteEvent.getNoteName().getMidi(), DEFAULT_NOISE);
-		} else {
-			return new NoteOff(tick, channel, noteEvent.getNoteName().getMidi(), DEFAULT_SILENT);
-		}
-	}
+    public ChannelEvent convertNoteEvent(long tick, NoteEvent noteEvent, int channel) {
+        if (noteEvent.isNoteOn()) {
+            return new NoteOn(tick, channel, noteEvent.getNoteName().getMidi(), DEFAULT_NOISE);
+        } else {
+            return new NoteOff(tick, channel, noteEvent.getNoteName().getMidi(), DEFAULT_SILENT);
+        }
+    }
 }

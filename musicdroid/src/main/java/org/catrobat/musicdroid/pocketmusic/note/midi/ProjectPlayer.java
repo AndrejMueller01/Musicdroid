@@ -102,7 +102,7 @@ public class ProjectPlayer {
             ToastDisplayer.showDoneToast(activity.getApplicationContext());
             ProjectSelectionActivity projectSelectionActivity = (ProjectSelectionActivity) activity;
             projectSelectionActivity.notifyTrackPlayed();
-        } catch (Exception e){
+        } catch (Exception e) {
         }
     }
 

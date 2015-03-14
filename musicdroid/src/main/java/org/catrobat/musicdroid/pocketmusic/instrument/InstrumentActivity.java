@@ -50,7 +50,6 @@ import org.catrobat.musicdroid.pocketmusic.projectselection.dialog.SaveProjectDi
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Locale;
 
 public abstract class InstrumentActivity extends FragmentActivity {
 
@@ -106,6 +105,18 @@ public abstract class InstrumentActivity extends FragmentActivity {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        trackPlayer.stop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
@@ -117,15 +128,36 @@ public abstract class InstrumentActivity extends FragmentActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
 
-        trackPlayer.stop();
+        if (!activityInFocus) {
+            trackPlayer.stop();
+        }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void handleExtras() {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            if (extras.containsKey(ProjectSelectionActivity.INTENT_EXTRA_FILE_NAME)) {
+                final String projectName = extras.getString(ProjectSelectionActivity.INTENT_EXTRA_FILE_NAME);
+                MidiToProjectConverter midiConverter = new MidiToProjectConverter();
+                File midiFile = new File(ProjectToMidiConverter.MIDI_FOLDER,
+                        projectName + ProjectToMidiConverter.MIDI_FILE_EXTENSION);
+                setTitle(projectName);
+
+                try {
+                    //TODO fw consider more tracks
+                    project = midiConverter.convertMidiFileToProject(midiFile);
+                    Track track = project.getTrack(0);
+                    TrackToSymbolContainerConverter trackConverter = new TrackToSymbolContainerConverter();
+                    symbolContainer = trackConverter.convertTrack(track, beatsPerMinute);
+                } catch (MidiException | IOException e) {
+                    ErrorDialog.createDialog(R.string.dialog_open_midi_error, e).show(getFragmentManager(), "tag");
+                }
+                getIntent().removeExtra(ProjectSelectionActivity.INTENT_EXTRA_FILE_NAME);
+            }
+        }
     }
 
     public void addNoteEvent(NoteEvent noteEvent) {
@@ -145,6 +177,8 @@ public abstract class InstrumentActivity extends FragmentActivity {
         redraw();
     }
 
+    protected abstract void redraw();
+
     public void addBreak(BreakSymbol breakSymbol) {
         if (symbolContainer.size() >= MAX_SYMBOLS_SIZE) {
             return;
@@ -152,6 +186,12 @@ public abstract class InstrumentActivity extends FragmentActivity {
 
         symbolContainer.add(breakSymbol);
         redraw();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        activityInFocus = hasFocus;
     }
 
     @Override
@@ -170,15 +210,16 @@ public abstract class InstrumentActivity extends FragmentActivity {
             onActionClear();
             return true;
         } else if (id == R.id.action_play_and_stop_midi) {
-            if (trackPlayer.isPlaying()) {
-                item.setIcon(R.drawable.ic_action_play);
-                item.setTitle(R.string.action_play_midi);
-                onActionStop();
-            } else {
+            if (item.getTitle().equals(getString(R.string.menu_play))) {
                 item.setIcon(R.drawable.ic_action_stop);
-                item.setTitle(R.string.action_stop_midi);
+                item.setTitle(R.string.menu_stop);
                 onActionPlay();
+            } else {
+                item.setIcon(R.drawable.ic_action_play);
+                item.setTitle(R.string.menu_play);
+                onActionStop();
             }
+
             return true;
         }
 
@@ -200,7 +241,7 @@ public abstract class InstrumentActivity extends FragmentActivity {
         symbolContainer.clear();
         redraw();
 
-        Toast.makeText(getBaseContext(), R.string.action_delete_midi_success, Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), R.string.clear_success, Toast.LENGTH_LONG).show();
     }
 
     private void onActionPlay() {
@@ -213,12 +254,12 @@ public abstract class InstrumentActivity extends FragmentActivity {
             trackPlayer.play(this, getCacheDir(), converter.convertSymbols(symbolContainer, beatsPerMinute), Project.DEFAULT_BEATS_PER_MINUTE);
             ToastDisplayer.showPlayToast(getBaseContext());
         } catch (Exception e) {
-            ErrorDialog.createDialog(R.string.action_play_midi_error, e).show(getFragmentManager(), "tag");
+            ErrorDialog.createDialog(R.string.dialog_play_error, e).show(getFragmentManager(), "tag");
         }
     }
 
     private void onActionStop() {
-            trackPlayer.stop();
+        trackPlayer.stop();
         ToastDisplayer.showStopToast(getBaseContext());
     }
 
@@ -232,11 +273,11 @@ public abstract class InstrumentActivity extends FragmentActivity {
                 project.clear();
                 project.addTrack(symbolsConverter.convertSymbols(symbolContainer, beatsPerMinute));
                 converter.writeProjectAsMidi(project);
-                Toast.makeText(getBaseContext(), R.string.dialog_project_save_success, Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), R.string.save_success, Toast.LENGTH_LONG).show();
             } catch (MidiException e) {
-                ErrorDialog.createDialog(R.string.dialog_project_save_error, e).show(getFragmentManager(), "tag");
+                ErrorDialog.createDialog(R.string.dialog_save_error, e).show(getFragmentManager(), "tag");
             } catch (IOException e) {
-                ErrorDialog.createDialog(R.string.dialog_project_name_exists_error, e).show(getFragmentManager(), "tag");
+                ErrorDialog.createDialog(R.string.dialog_name_error, e).show(getFragmentManager(), "tag");
             }
         } else {
             Bundle args = new Bundle();
@@ -247,46 +288,4 @@ public abstract class InstrumentActivity extends FragmentActivity {
             dialog.show(getFragmentManager(), "tag");
         }
     }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        activityInFocus = hasFocus;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if (!activityInFocus) {
-            trackPlayer.stop();
-        }
-    }
-
-
-    private void handleExtras() {
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            if (extras.containsKey(ProjectSelectionActivity.INTENT_EXTRA_FILE_NAME)) {
-                final String projectName = extras.getString(ProjectSelectionActivity.INTENT_EXTRA_FILE_NAME);
-                MidiToProjectConverter midiConverter = new MidiToProjectConverter();
-                File midiFile = new File(ProjectToMidiConverter.MIDI_FOLDER,
-                        projectName + ProjectToMidiConverter.MIDI_FILE_EXTENSION);
-                setTitle(projectName);
-
-                try {
-                    //TODO fw consider more tracks
-                    project = midiConverter.convertMidiFileToProject(midiFile);
-                    Track track = project.getTrack(0);
-                    TrackToSymbolContainerConverter trackConverter = new TrackToSymbolContainerConverter();
-                    symbolContainer = trackConverter.convertTrack(track, beatsPerMinute);
-                } catch (MidiException | IOException e) {
-                    ErrorDialog.createDialog(R.string.midi_open, e).show(getFragmentManager(), "tag");
-                }
-                getIntent().removeExtra(ProjectSelectionActivity.INTENT_EXTRA_FILE_NAME);
-            }
-        }
-    }
-
-    protected abstract void redraw();
 }

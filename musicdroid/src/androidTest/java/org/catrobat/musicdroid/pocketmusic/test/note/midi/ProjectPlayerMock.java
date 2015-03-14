@@ -41,13 +41,13 @@ public class ProjectPlayerMock extends ProjectPlayer {
     }
 
     @Override
-    protected MediaPlayer createTrackPlayer(final Activity activity, final Uri uri) {
-        return new MediaPlayerMock();
+    public void onPlayComplete(File tempPlayFile, Activity activity) {
+        super.onPlayComplete(tempPlayFile, activity);
     }
 
     @Override
-    public void onPlayComplete(File tempPlayFile, Activity activity) {
-        super.onPlayComplete(tempPlayFile, activity);
+    protected MediaPlayer createTrackPlayer(final Activity activity, final Uri uri) {
+        return new MediaPlayerMock();
     }
 
     private class MediaPlayerMock extends MediaPlayer {
