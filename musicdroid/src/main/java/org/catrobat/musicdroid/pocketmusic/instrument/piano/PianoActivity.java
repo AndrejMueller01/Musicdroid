@@ -48,11 +48,15 @@ public class PianoActivity extends InstrumentActivity {
 
     private EditModeContextMenu editModeContextMenu;
 
+    public PianoActivity(MusicalKey key, MusicalInstrument instrument) {
+        super(key, instrument);
+    }
+
     public PianoActivity() {
         super(MusicalKey.VIOLIN, MusicalInstrument.ACOUSTIC_GRAND_PIANO);
     }
 
-    public PianoViewFragment getPianoViewFragment() {
+    protected PianoViewFragment getPianoViewFragment() {
         return pianoViewFragment;
     }
 

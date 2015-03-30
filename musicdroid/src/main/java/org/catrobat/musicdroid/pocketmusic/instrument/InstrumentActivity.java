@@ -290,7 +290,6 @@ public abstract class InstrumentActivity extends Activity {
         }
     }
 
-
     private void handleExtras() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {

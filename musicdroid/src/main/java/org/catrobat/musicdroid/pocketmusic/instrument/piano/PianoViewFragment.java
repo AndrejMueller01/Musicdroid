@@ -105,7 +105,6 @@ public class PianoViewFragment extends Fragment {
         ArrayList<RelativeLayout.LayoutParams> blackKeyLayoutParams = new ArrayList<>();
         ArrayList<RelativeLayout.LayoutParams> whiteKeyLayoutParams = new ArrayList<>();
 
-
         for (int i = 0; i < blackButtons.size(); i++) {
             blackKeyLayoutParams.add(new RelativeLayout.LayoutParams(
                     buttonWidth,
