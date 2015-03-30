@@ -63,9 +63,7 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
 
         try {
             createSampleProjectFiles(NUMBER_OF_SAMPLE_PROJECTS);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (MidiException e) {
+        } catch (IOException | MidiException e) {
             e.printStackTrace();
         }
 
@@ -129,24 +127,24 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
     }
 
     // --------------------------------------- TESTS ----------------------------------------------
-    public void testContextMenuDelete() throws IOException, MidiException {
+    public void testContextMenuDeleteStartMidTail() throws IOException, MidiException {
         int[] projectIndicesToDelete = {0, NUMBER_OF_SAMPLE_PROJECTS / 2, NUMBER_OF_SAMPLE_PROJECTS - 1};
         tapAndHoldDeleteRoutine(projectIndicesToDelete);
     }
 
-    public void testContextMenuDelete2() throws IOException, MidiException {
+    public void testContextMenuDeleteFirst() throws IOException, MidiException {
         int[] projectIndicesToDelete = {0};
         tapAndHoldDeleteRoutine(projectIndicesToDelete);
     }
 
-    public void testContextMenuDelete3() throws IOException, MidiException {
+    public void testContextMenuDeleteAll() throws IOException, MidiException {
         int[] projectIndicesToDelete = new int[NUMBER_OF_SAMPLE_PROJECTS];
         for (int i = 0; i < projectIndicesToDelete.length; i++)
             projectIndicesToDelete[i] = i;
         tapAndHoldDeleteRoutine(projectIndicesToDelete);
     }
 
-    public void testContextMenuDelete4() throws IOException, MidiException {
+    public void testContextMenuDeleteAllTapAndHold() throws IOException, MidiException {
         int[] projectIndicesToDelete = new int[NUMBER_OF_SAMPLE_PROJECTS];
         for (int i = 0; i < projectIndicesToDelete.length; i++)
             projectIndicesToDelete[i] = i;

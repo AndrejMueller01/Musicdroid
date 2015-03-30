@@ -45,7 +45,7 @@ public class PianoViewFragment extends Fragment {
         rootView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, displayMeasurements.getHalfDisplayHeight()));
 
         findViewsById(rootView);
-        prepareViewDependingOnOrientation();
+        prepareViewDependingOnOrientation(getActivity().getResources().getConfiguration().orientation);
         setOnTouchListeners();
 
         return rootView;
@@ -68,8 +68,8 @@ public class PianoViewFragment extends Fragment {
         blackButtons.add((Button) rootView.findViewById(R.id.oct_button_06_black));
     }
 
-    public void prepareViewDependingOnOrientation() {
-        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+    public void prepareViewDependingOnOrientation(int orientation) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE)
             calculatePianoKeyPositions(DEFAULT_LANDSCAPE_KEY_WIDTH_SCALE_FACTOR,
                     DEFAULT_BLACK_KEY_HEIGHT_SCALE_FACTOR);
         else

@@ -53,7 +53,7 @@ public class PianoActivityUiTest extends ActivityInstrumentationTestCase2<PianoA
     protected void setUp() {
         solo = new Solo(getInstrumentation(), getActivity());
         pianoActivity = getActivity();
-        pianoActivity.inCallback = false;
+        InstrumentActivity.inCallback = false;
     }
 
     @Override

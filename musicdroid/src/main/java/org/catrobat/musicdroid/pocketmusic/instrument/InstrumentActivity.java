@@ -22,8 +22,8 @@
  */
 package org.catrobat.musicdroid.pocketmusic.instrument;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -53,7 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public abstract class InstrumentActivity extends FragmentActivity {
+public abstract class InstrumentActivity extends Activity {
 
     public static boolean inCallback = false;
 

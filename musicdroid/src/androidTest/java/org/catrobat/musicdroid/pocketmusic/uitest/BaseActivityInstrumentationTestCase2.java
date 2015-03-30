@@ -34,8 +34,6 @@ public abstract class BaseActivityInstrumentationTestCase2<T extends Activity> e
 
     protected Solo solo;
 
-    private static final String TAG = "BaseActivityInstrumentationTestCase";
-
     public BaseActivityInstrumentationTestCase2(Class<T> activityClass) {
         super(activityClass);
     }
@@ -43,13 +41,11 @@ public abstract class BaseActivityInstrumentationTestCase2<T extends Activity> e
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        Log.d(TAG, "setUp");
         solo = new Solo(getInstrumentation(), getActivity());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        Log.v(TAG, "tearDown");
         solo.finishOpenedActivities();
         solo = null;
         super.tearDown();

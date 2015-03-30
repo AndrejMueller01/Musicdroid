@@ -23,12 +23,14 @@
 
 package org.catrobat.musicdroid.pocketmusic.test.instrument.piano;
 
+import android.content.pm.ActivityInfo;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.widget.Button;
 
 import org.catrobat.musicdroid.pocketmusic.instrument.piano.PianoActivity;
 import org.catrobat.musicdroid.pocketmusic.instrument.piano.PianoViewFragment;
+import org.catrobat.musicdroid.pocketmusic.note.Octave;
 import org.catrobat.musicdroid.pocketmusic.tools.DisplayMeasurements;
 
 public class PianoViewFragmentTest extends ActivityInstrumentationTestCase2<PianoActivity> {
@@ -47,18 +49,16 @@ public class PianoViewFragmentTest extends ActivityInstrumentationTestCase2<Pian
 
     @UiThreadTest
     public void testCalculatePianoKeyPositions() {
-        int blackKeyHeightScaleFactor = 6;
-        int keyWidthScaleFactor = 0;
         int keysPerOctave = 7;
 
-        pianoViewFragment.calculatePianoKeyPositions(keyWidthScaleFactor, blackKeyHeightScaleFactor);
+        pianoViewFragment.calculatePianoKeyPositions(PianoViewFragment.DEFAULT_PIANO_KEY_WIDTH_SCALE_FACTOR, PianoViewFragment.DEFAULT_BLACK_KEY_HEIGHT_SCALE_FACTOR);
 
-        assertButtonPosition(keyWidthScaleFactor, keysPerOctave);
+        assertButtonPosition(PianoViewFragment.DEFAULT_PIANO_KEY_WIDTH_SCALE_FACTOR);
     }
 
-    private void assertButtonPosition(int keyWidthScaleFactor, int keysPerOctave) {
+    private void assertButtonPosition(int keyWidthScaleFactor) {
         DisplayMeasurements displayMeasurements = new DisplayMeasurements(getActivity());
-        int buttonWidth = displayMeasurements.getDisplayWidth() / (keysPerOctave + keyWidthScaleFactor);
+        int buttonWidth = displayMeasurements.getDisplayWidth() / (Octave.NUMBER_OF_UNSIGNED_HALF_TONE_STEPS_PER_OCTAVE + keyWidthScaleFactor);
 
         for (int i = 0; i < pianoViewFragment.getBlackButtonCount(); i++)
             assertEquals(pianoViewFragment.getBlackButtonAtIndex(i).getWidth(), buttonWidth);
@@ -74,8 +74,8 @@ public class PianoViewFragmentTest extends ActivityInstrumentationTestCase2<Pian
 
     @UiThreadTest
     public void testButtonVisibilityPianoLayout() {
-        int expectedVisibility = 0;
-        int actualVisibility = 0;
+        int expectedVisibility;
+        int actualVisibility;
 
         for (int i = 0; i < pianoViewFragment.getBlackButtonCount(); i++) {
             if (i == PianoViewFragment.DEFAULT_INACTIVE_BLACK_KEY) {
@@ -92,31 +92,19 @@ public class PianoViewFragmentTest extends ActivityInstrumentationTestCase2<Pian
 
     @UiThreadTest
     public void testDisableBlackKey1() {
-        disableKeyAndAssertVisibility(1);
-    }
+        int index = 1;
 
-    @UiThreadTest
-    public void testDisableBlackKey2() {
-        disableKeyAndAssertVisibility(3);
-    }
-
-    @UiThreadTest
-    public void testDisableBlackKey3() {
-        disableKeyAndAssertVisibility(100);
-    }
-
-    @UiThreadTest
-    public void testDisableBlackKey4() {
-        disableKeyAndAssertVisibility(-1);
-    }
-
-    private void disableKeyAndAssertVisibility(int index) {
         pianoViewFragment.setBlackKeyInvisible(index);
-
         Button button = pianoViewFragment.getBlackButtonAtIndex(index);
 
-        if (button != null) {
-            assertEquals(button.getVisibility(), Button.INVISIBLE);
-        }
+        assertEquals(button.getVisibility(), Button.INVISIBLE);
+    }
+
+    @UiThreadTest
+    public void testPianoButtonLayoutByOrientation() {
+        // TODO
+        // pianoViewFragment.prepareViewDependingOnOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+       // assertButtonPosition(PianoViewFragment.DEFAULT_LANDSCAPE_KEY_WIDTH_SCALE_FACTOR);
     }
 }
