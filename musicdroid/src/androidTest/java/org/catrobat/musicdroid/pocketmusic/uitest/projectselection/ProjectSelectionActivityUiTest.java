@@ -36,6 +36,7 @@ import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectToMidiConverter;
 import org.catrobat.musicdroid.pocketmusic.projectselection.ProjectSelectionActivity;
 import org.catrobat.musicdroid.pocketmusic.test.note.ProjectTestDataFactory;
 import org.catrobat.musicdroid.pocketmusic.test.note.midi.ProjectToMidiConverterTestDataFactory;
+import org.catrobat.musicdroid.pocketmusic.uitest.ContextualActionBarHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,18 +45,19 @@ import java.util.ArrayList;
 public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestCase2<ProjectSelectionActivity> {
 
     private static final int NUMBER_OF_SAMPLE_PROJECTS = 10;
-    private MidiPlayer midiplayer = MidiPlayer.getInstance();
-
-    private Solo solo;
     private static final String FILE_NAME = "TestProject";
+    private MidiPlayer midiplayer = MidiPlayer.getInstance();
+    private Solo solo;
     private ProjectSelectionActivity projectSelectionActivity;
+    private ContextualActionBarHelper contextualActionBarHelper;
 
     public ProjectSelectionActivityUiTest() {
         super(ProjectSelectionActivity.class);
     }
 
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
         if (ProjectToMidiConverter.MIDI_FOLDER.isDirectory()) {
             for (File file : ProjectToMidiConverter.MIDI_FOLDER.listFiles())
                 file.delete();
@@ -68,19 +70,20 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         }
 
         solo = new Solo(getInstrumentation(), getActivity());
+        contextualActionBarHelper = new ContextualActionBarHelper(solo);
         projectSelectionActivity = getActivity();
     }
 
     @Override
-    protected void tearDown() {
+    protected void tearDown() throws Exception {
         if (ProjectToMidiConverter.MIDI_FOLDER.isDirectory()) {
             for (File file : ProjectToMidiConverter.MIDI_FOLDER.listFiles())
                 file.delete();
         }
         solo.finishOpenedActivities();
+        super.tearDown();
     }
 
-    // --------------------------------------- HELPER ----------------------------------------------
     private void createSampleProjectFiles(int amount) throws IOException, MidiException {
         for (int i = 0; i < amount; i++) {
             Project project = ProjectTestDataFactory.createProjectWithOneSimpleTrack(FILE_NAME + i);
@@ -88,48 +91,27 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         }
     }
 
-    private void createSampleProjectFile(String name) throws IOException, MidiException {
-        Project project = ProjectTestDataFactory.createProjectWithOneSimpleTrack(name);
-        ProjectToMidiConverterTestDataFactory.writeTestProject(project);
+    public void testContextMenuDeleteStartMidTail() throws IOException, MidiException {
+        int[] projectIndicesToDelete = {0, NUMBER_OF_SAMPLE_PROJECTS / 2, NUMBER_OF_SAMPLE_PROJECTS - 1};
+        tapAndHoldDeleteRoutine(projectIndicesToDelete);
     }
 
-    private void tapAndHoldDeleteRoutine(int[] projectIndicesToDelete) throws IOException, MidiException {
+    private void tapAndHoldDeleteRoutine(int[] projectsToDelete) throws IOException, MidiException {
         ArrayList<File> expectedProjects = ProjectTestDataFactory.getProjectFilesInStorage();
 
-        for (int i = 0; i < projectIndicesToDelete.length; i++) {
+        for (int i = 0; i < projectsToDelete.length; i++) {
             if (i == 0)
-                solo.clickLongOnText(FILE_NAME + projectIndicesToDelete[i]);
+                solo.clickLongOnText(FILE_NAME + projectsToDelete[i]);
             else
-                solo.clickOnText(FILE_NAME + projectIndicesToDelete[i]);
+                solo.clickOnText(FILE_NAME + projectsToDelete[i]);
 
-            expectedProjects.remove(projectIndicesToDelete[i] - i);
+            expectedProjects.remove(projectsToDelete[i] - i);
         }
 
         solo.clickOnView(getActivity().findViewById(R.id.callback_action_delete_project));
         solo.waitForText(projectSelectionActivity.getString(R.string.delete_success));
 
         assertEquals(ProjectTestDataFactory.getProjectFilesInStorage(), expectedProjects);
-    }
-
-    private void deleteButtonRoutine(int[] projectIndicesToDelete) throws IOException, MidiException {
-        ArrayList<File> expectedProjects = ProjectTestDataFactory.getProjectFilesInStorage();
-
-        solo.clickOnView(getActivity().findViewById(R.id.action_delete_project));
-        for (int i = 0; i < projectIndicesToDelete.length; i++) {
-            solo.clickOnText(FILE_NAME + projectIndicesToDelete[i]);
-            expectedProjects.remove(projectIndicesToDelete[i] - i);
-        }
-
-        solo.clickOnView(getActivity().findViewById(R.id.callback_action_delete_project));
-        solo.sleep(1000);
-
-        assertEquals(ProjectTestDataFactory.getProjectFilesInStorage(), expectedProjects);
-    }
-
-    // --------------------------------------- TESTS ----------------------------------------------
-    public void testContextMenuDeleteStartMidTail() throws IOException, MidiException {
-        int[] projectIndicesToDelete = {0, NUMBER_OF_SAMPLE_PROJECTS / 2, NUMBER_OF_SAMPLE_PROJECTS - 1};
-        tapAndHoldDeleteRoutine(projectIndicesToDelete);
     }
 
     public void testContextMenuDeleteFirst() throws IOException, MidiException {
@@ -151,6 +133,21 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         deleteButtonRoutine(projectIndicesToDelete);
     }
 
+    private void deleteButtonRoutine(int[] projectIndicesToDelete) throws IOException, MidiException {
+        ArrayList<File> expectedProjects = ProjectTestDataFactory.getProjectFilesInStorage();
+
+        solo.clickOnView(getActivity().findViewById(R.id.action_delete_project));
+        for (int i = 0; i < projectIndicesToDelete.length; i++) {
+            solo.clickOnText(FILE_NAME + projectIndicesToDelete[i]);
+            expectedProjects.remove(projectIndicesToDelete[i] - i);
+        }
+
+        solo.clickOnView(getActivity().findViewById(R.id.callback_action_delete_project));
+        solo.sleep(1000);
+
+        assertEquals(ProjectTestDataFactory.getProjectFilesInStorage(), expectedProjects);
+    }
+
     public void testLinkToNextActivity() {
         solo.clickOnButton(getActivity().getResources().getString(R.string.plus));
         solo.waitForActivity(PianoActivity.class);
@@ -159,12 +156,14 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
 
     public void testProjectListCount() throws IOException, MidiException {
         solo.sleep(1000);
+
         assertEquals(getActivity().getProjectSelectionFragment().getListViewAdapter().getCount(), NUMBER_OF_SAMPLE_PROJECTS);
     }
 
     public void testPlayButton() throws IOException, MidiException {
         solo.clickOnView(solo.getView(R.id.project_play_button, 2));
         solo.sleep(500);
+
         assertEquals(midiplayer.isPlaying(), true);
     }
 
@@ -174,6 +173,7 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         for (int i = 0; i < counter; i++)
             solo.clickOnText(FILE_NAME + i);
         solo.sleep(100);
+
         assertEquals(counter + "",
                 projectSelectionActivity.getProjectSelectionContextMenu().getActionMode().getTitle());
     }
@@ -195,12 +195,83 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         solo.waitForActivity(PianoActivity.class);
         createSampleProjectFile(fileName);
         solo.goBack();
+
         assertTrue(solo.searchText(fileName));
+    }
+
+    private void createSampleProjectFile(String name) throws IOException, MidiException {
+        Project project = ProjectTestDataFactory.createProjectWithOneSimpleTrack(name);
+        ProjectToMidiConverterTestDataFactory.writeTestProject(project);
     }
 
     public void testAboutDialog() throws IOException {
         solo.clickOnMenuItem(getActivity().getResources().getString(R.string.menu_about));
         solo.waitForDialogToOpen();
+
         assertTrue(solo.searchText(getActivity().getResources().getString(R.string.menu_about)));
+    }
+
+    public void testEditTapAndHoldPositive() throws IOException, MidiException {
+        int projectToEdit = 0;
+        tapAndHoldEditRoutine(projectToEdit, true);
+
+        assertTrue(solo.searchText(FILE_NAME + projectToEdit + "edit"));
+    }
+
+    private void tapAndHoldEditRoutine(int projectToEdit, boolean clickOK) throws IOException, MidiException {
+        solo.clickLongOnText(FILE_NAME + projectToEdit);
+        contextualActionBarHelper.clickOnContextualActionBarItem(R.id.callback_action_edit_project, projectSelectionActivity.getString(R.string.menu_edit));
+        solo.waitForDialogToOpen();
+        solo.enterText(0, "edit");
+        if (clickOK)
+            solo.clickOnText(projectSelectionActivity.getString(android.R.string.yes));
+        else
+            solo.clickOnText(projectSelectionActivity.getString(android.R.string.cancel));
+        solo.waitForDialogToClose();
+    }
+
+    public void testEditTapAndHoldNegative() throws IOException, MidiException {
+        int projectToEdit = 0;
+        tapAndHoldEditRoutine(projectToEdit, false);
+
+        assertTrue(solo.searchText(FILE_NAME + projectToEdit));
+    }
+
+    public void testCopyTapAndHoldNegative() throws IOException, MidiException {
+        int projectToCopy = 0;
+        tapAndHoldCopyRoutine(projectToCopy, false);
+
+        assertFalse(solo.searchText("copy"));
+    }
+
+    private void tapAndHoldCopyRoutine(int projectToCopy, boolean clickOK) throws IOException, MidiException {
+        solo.clickLongOnText(FILE_NAME + projectToCopy);
+        contextualActionBarHelper.clickOnContextualActionBarItem(R.id.callback_action_copy_project, projectSelectionActivity.getString(R.string.menu_copy));
+        solo.waitForDialogToOpen();
+        solo.enterText(0, "copy");
+        if (clickOK)
+            solo.clickOnText(projectSelectionActivity.getString(android.R.string.yes));
+        else
+            solo.clickOnText(projectSelectionActivity.getString(android.R.string.cancel));
+        solo.waitForDialogToClose();
+    }
+
+    public void testCopyTapAndHoldPositive() throws IOException, MidiException {
+        int projectToCopy = 0;
+        tapAndHoldCopyRoutine(projectToCopy, true);
+
+        assertTrue(solo.searchText("copy"));
+    }
+
+    public void testShareTapAndHold() throws IOException, MidiException {
+        int projectToShare = 0;
+        tapAndHoldShareRoutine(projectToShare);
+
+        assertTrue(solo.getCurrentActivity().getLocalClassName().equals("projectselection.ProjectSelectionActivity"));
+    }
+
+    private void tapAndHoldShareRoutine(int projectToShare) throws IOException, MidiException {
+        solo.clickLongOnText(FILE_NAME + projectToShare);
+        contextualActionBarHelper.clickOnContextualActionBarItem(R.id.callback_action_share_project, projectSelectionActivity.getString(R.string.menu_share));
     }
 }
