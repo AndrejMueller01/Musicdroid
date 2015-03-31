@@ -23,9 +23,13 @@
 
 package org.catrobat.musicdroid.pocketmusic.uitest.instrument.piano;
 
+import android.content.pm.ActivityInfo;
+
 import org.catrobat.musicdroid.pocketmusic.R;
 import org.catrobat.musicdroid.pocketmusic.instrument.InstrumentActivity;
+import org.catrobat.musicdroid.pocketmusic.note.NoteLength;
 import org.catrobat.musicdroid.pocketmusic.note.NoteName;
+import org.catrobat.musicdroid.pocketmusic.note.Project;
 import org.catrobat.musicdroid.pocketmusic.note.midi.ProjectToMidiConverter;
 import org.catrobat.musicdroid.pocketmusic.test.note.NoteEventTestDataFactory;
 import org.catrobat.musicdroid.pocketmusic.uitest.BaseActivityInstrumentationTestCase2;
@@ -35,6 +39,7 @@ import java.io.File;
 public class PianoActivityUiTest extends BaseActivityInstrumentationTestCase2<PianoActivityMock> {
 
     private PianoActivityMock pianoActivity;
+    public final static int DEFAULT_TICK_LENGTH = (int) NoteLength.QUARTER.toTicks(Project.DEFAULT_BEATS_PER_MINUTE);
 
     public PianoActivityUiTest() {
         super(PianoActivityMock.class);
@@ -76,6 +81,8 @@ public class PianoActivityUiTest extends BaseActivityInstrumentationTestCase2<Pi
             public void run() {
                 for (NoteName noteName : noteNames) {
                     pianoActivity.addNoteEvent(NoteEventTestDataFactory.createNoteEvent(noteName, true));
+                }
+                for (NoteName noteName : noteNames) {
                     pianoActivity.addNoteEvent(NoteEventTestDataFactory.createNoteEvent(noteName, false));
                 }
             }
@@ -116,210 +123,226 @@ public class PianoActivityUiTest extends BaseActivityInstrumentationTestCase2<Pi
         getInstrumentation().waitForIdleSync();
         pianoActivity = getActivity();
     }
+/*
+    public void testRotateWithSymbolsDrawn() throws Throwable {
+        long startFirstNote = 0;
+        long endFirstNote = 60;
+        long startSecondNote = 60;
+        long endSecondNote = 120;
 
-    /*
-        public void testRotateWithSymbolsDrawn() throws Throwable {
-            addNoteToNoteSheet(NoteName.C4);
-            solo.sleep(5000);
+        long[] currentTimeMillis = {startFirstNote, endFirstNote,
+                startSecondNote, endSecondNote};
 
-            rotateAndReturnActivity(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            solo.sleep(5000);
-            addNoteToNoteSheet(NoteName.D4);
-            solo.sleep(5000);
+        pianoActivity.initializeTickProvider(currentTimeMillis);
+        addNoteToNoteSheet(NoteName.C4);
+        solo.sleep(5000);
+        rotateAndReturnActivity(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        solo.sleep(5000);
+        addNoteToNoteSheet(NoteName.D4);
+        solo.sleep(5000);
 
-
-            assertEquals(2, pianoActivity.getSymbolContainer().size());
-        }
-
-        /*
+        assertEquals(2, pianoActivity.getSymbolContainer().size());
+    }
 
 
-                    public void testRotateAndUndo() {
+
+
+                public void testRotateAndUndo() {
+                    solo.clickOnButton(PIANO_BUTTON_TEXT);
+                    rotateAndReturnActivity(Solo.LANDSCAPE);
+                    solo.clickOnButton(PIANO_BUTTON_TEXT);
+                    rotateAndReturnActivity(Solo.PORTRAIT);
+
+                    solo.clickOnActionBarItem(R.id.action_undo_midi);
+                    solo.clickOnActionBarItem(R.id.action_undo_midi);
+
+                    assertEquals(0, pianoActivity.getSymbolContainer().size());
+                }
+
+                public void testPlayMidi() throws InterruptedException {
+                    clickSomePianoButtonsForLargeTrack();
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+                    Thread.sleep(100);
+                    assertTrue(pianoActivity.getMidiPlayer().isPlaying());
+                }
+
+                public void testPlayButtonShown() {
+                    assertTrue(solo.getCurrentActivity().getResources().getDrawable(R.drawable.ic_action_play).isVisible());
+                }
+
+                public void testStopButtonShown() {
+                    clickSomePianoButtonsForLargeTrack();
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+                    assertTrue(solo.getCurrentActivity().getResources().getDrawable(R.drawable.ic_action_stop).isVisible());
+                }
+
+                public void testPlayButtonShownAfterStop() {
+                    clickSomePianoButtonsForLargeTrack();
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+                    assertTrue(solo.getCurrentActivity().getResources().getDrawable(R.drawable.ic_action_play).isVisible());
+                }
+
+                public void testStopMidi() {
+                    clickSomePianoButtonsForLargeTrack();
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+                    solo.waitForText(pianoActivity.getString(R.string.stopped));
+                    assertFalse(pianoActivity.getMidiPlayer().isPlaying());
+                }
+
+                private void clickSomePianoButtonsForLargeTrack() {
+                    int numberOfNotes = 5;
+
+                    for (int i = 0; i < numberOfNotes; i++) {
                         solo.clickOnButton(PIANO_BUTTON_TEXT);
-                        rotateAndReturnActivity(Solo.LANDSCAPE);
+                    }
+                }
+
+                public void testPlayMidiEmptyTrack() {
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+
+                    assertFalse(pianoActivity.getMidiPlayer().isPlaying());
+                }
+
+                public void testPlayMidiFinishedPlaying() throws InterruptedException {
+                    solo.clickOnButton(PIANO_BUTTON_TEXT);
+                    solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
+                    solo.waitForDialogToOpen();
+                    solo.waitForDialogToClose();
+
+                    assertFalse(pianoActivity.getMidiPlayer().isPlaying());
+                }
+
+                public void testClickOnButtonMaxTrackSize() {
+                    int buttonPressCount = InstrumentActivity.MAX_SYMBOLS_SIZE;
+
+                    for (int i = 0; i < buttonPressCount; i++) {
                         solo.clickOnButton(PIANO_BUTTON_TEXT);
-                        rotateAndReturnActivity(Solo.PORTRAIT);
-
-                        solo.clickOnActionBarItem(R.id.action_undo_midi);
-                        solo.clickOnActionBarItem(R.id.action_undo_midi);
-
-                        assertEquals(0, pianoActivity.getSymbolContainer().size());
                     }
 
-                    public void testPlayMidi() throws InterruptedException {
-                        clickSomePianoButtonsForLargeTrack();
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-                        Thread.sleep(100);
-                        assertTrue(pianoActivity.getMidiPlayer().isPlaying());
-                    }
+                    solo.clickOnButton(PIANO_BUTTON_TEXT);
 
-                    public void testPlayButtonShown() {
-                        assertTrue(solo.getCurrentActivity().getResources().getDrawable(R.drawable.ic_action_play).isVisible());
-                    }
+                    assertEquals(InstrumentActivity.MAX_SYMBOLS_SIZE, pianoActivity.getSymbolContainer().size());
+                }
 
-                    public void testStopButtonShown() {
-                        clickSomePianoButtonsForLargeTrack();
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-                        assertTrue(solo.getCurrentActivity().getResources().getDrawable(R.drawable.ic_action_stop).isVisible());
-                    }
+                public void testMaxTrackSizeTextView() {
+                    int buttonPressCount = 6;
 
-                    public void testPlayButtonShownAfterStop() {
-                        clickSomePianoButtonsForLargeTrack();
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-                        assertTrue(solo.getCurrentActivity().getResources().getDrawable(R.drawable.ic_action_play).isVisible());
-                    }
-
-                    public void testStopMidi() {
-                        clickSomePianoButtonsForLargeTrack();
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-                        solo.waitForText(pianoActivity.getString(R.string.stopped));
-                        assertFalse(pianoActivity.getMidiPlayer().isPlaying());
-                    }
-
-                    private void clickSomePianoButtonsForLargeTrack() {
-                        int numberOfNotes = 5;
-
-                        for (int i = 0; i < numberOfNotes; i++) {
-                            solo.clickOnButton(PIANO_BUTTON_TEXT);
-                        }
-                    }
-
-                    public void testPlayMidiEmptyTrack() {
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-
-                        assertFalse(pianoActivity.getMidiPlayer().isPlaying());
-                    }
-
-                    public void testPlayMidiFinishedPlaying() throws InterruptedException {
+                    for (int i = 0; i < buttonPressCount; i++) {
                         solo.clickOnButton(PIANO_BUTTON_TEXT);
-                        solo.clickOnActionBarItem(R.id.action_play_and_stop_midi);
-                        solo.waitForDialogToOpen();
-                        solo.waitForDialogToClose();
-
-                        assertFalse(pianoActivity.getMidiPlayer().isPlaying());
                     }
 
-                    public void testClickOnButtonMaxTrackSize() {
-                        int buttonPressCount = InstrumentActivity.MAX_SYMBOLS_SIZE;
+                    String expectedTextViewText = buttonPressCount + " / " + InstrumentActivity.MAX_SYMBOLS_SIZE;
+                    String actualTextViewText = pianoActivity.getTrackSizeString();
 
-                        for (int i = 0; i < buttonPressCount; i++) {
-                            solo.clickOnButton(PIANO_BUTTON_TEXT);
-                        }
+                    assertEquals(expectedTextViewText, actualTextViewText);
+                }
 
-                        solo.clickOnButton(PIANO_BUTTON_TEXT);
+                public void testEditModeDelete() {
+                    enterEditModeWithOneMarkedSymbol();
 
-                        assertEquals(InstrumentActivity.MAX_SYMBOLS_SIZE, pianoActivity.getSymbolContainer().size());
-                    }
+                    assertTrue(PianoActivity.inCallback);
 
-                    public void testMaxTrackSizeTextView() {
-                        int buttonPressCount = 6;
+                    clickDeleteInEditMode();
 
-                        for (int i = 0; i < buttonPressCount; i++) {
-                            solo.clickOnButton(PIANO_BUTTON_TEXT);
-                        }
+                    assertFalse(PianoActivity.inCallback);
+                    assertEquals(0, pianoActivity.getSymbolContainer().size());
+                    assertEquals(0, pianoActivity.getSymbolContainer().getMarkedSymbolCount());
+                }
 
-                        String expectedTextViewText = buttonPressCount + " / " + InstrumentActivity.MAX_SYMBOLS_SIZE;
-                        String actualTextViewText = pianoActivity.getTrackSizeString();
+                public void testEditModeDeleteUndo() {
+                    enterEditModeWithOneMarkedSymbol();
+                    clickDeleteInEditMode();
 
-                        assertEquals(expectedTextViewText, actualTextViewText);
-                    }
+                    solo.clickOnActionBarItem(R.id.action_undo_midi);
 
-                    public void testEditModeDelete() {
-                        enterEditModeWithOneMarkedSymbol();
+                    assertEquals(0, pianoActivity.getSymbolContainer().size());
+                }
 
-                        assertTrue(PianoActivity.inCallback);
+                public void testEditModeReplace() {
+                    enterEditModeWithOneMarkedSymbol();
+                    solo.clickOnButton(PIANO_BUTTON_TEXT);
 
-                        clickDeleteInEditMode();
-
-                        assertFalse(PianoActivity.inCallback);
-                        assertEquals(0, pianoActivity.getSymbolContainer().size());
-                        assertEquals(0, pianoActivity.getSymbolContainer().getMarkedSymbolCount());
-                    }
-
-                    public void testEditModeDeleteUndo() {
-                        enterEditModeWithOneMarkedSymbol();
-                        clickDeleteInEditMode();
-
-                        solo.clickOnActionBarItem(R.id.action_undo_midi);
-
-                        assertEquals(0, pianoActivity.getSymbolContainer().size());
-                    }
-
-                    public void testEditModeReplace() {
-                        enterEditModeWithOneMarkedSymbol();
-                        solo.clickOnButton(PIANO_BUTTON_TEXT);
-
-                        assertEquals(1, pianoActivity.getSymbolContainer().size());
-                        assertTrue(pianoActivity.getSymbolContainer().get(0).isMarked());
-                    }
+                    assertEquals(1, pianoActivity.getSymbolContainer().size());
+                    assertTrue(pianoActivity.getSymbolContainer().get(0).isMarked());
+                }
 
 
 
 
-                    private void clickDeleteInEditMode() {
-                        View v = getActivity().findViewById(R.id.edit_callback_action_delete_project);
-                        solo.clickOnView(v);
+                private void clickDeleteInEditMode() {
+                    View v = getActivity().findViewById(R.id.edit_callback_action_delete_project);
+                    solo.clickOnView(v);
 
-                        solo.sleep(1000);
-                    }
+                    solo.sleep(1000);
+                }
 
-                    public void testClickBreak() {
-                        solo.setActivityOrientation(Solo.PORTRAIT);
-                        solo.clickOnButton(1);
-                        solo.clickOnImageButton(1);
+                public void testClickBreak() {
+                    solo.setActivityOrientation(Solo.PORTRAIT);
+                    solo.clickOnButton(1);
+                    solo.clickOnImageButton(1);
 
-                        solo.sleep(1000);
+                    solo.sleep(1000);
 
-                        assertEquals(1, pianoActivity.getSymbolContainer().size());
-                        assertTrue(pianoActivity.getAdditionalSettingsFragment().isPianoViewVisible());
-                    }
+                    assertEquals(1, pianoActivity.getSymbolContainer().size());
+                    assertTrue(pianoActivity.getAdditionalSettingsFragment().isPianoViewVisible());
+                }
 
-                    public void testClickBreakAndReplace() {
-                        solo.setActivityOrientation(Solo.PORTRAIT);
-                        solo.clickOnButton(getActivity().getString(R.string.breaks));
-                        solo.clickOnImageButton(1);
+                public void testClickBreakAndReplace() {
+                    solo.setActivityOrientation(Solo.PORTRAIT);
+                    solo.clickOnButton(getActivity().getString(R.string.breaks));
+                    solo.clickOnImageButton(1);
 
-                        solo.sleep(1000);
+                    solo.sleep(1000);
 
-                        pianoActivity.getSymbolContainer().get(0).setMarked(true);
-                        solo.clickLongOnView(pianoActivity.getNoteSheetView());
+                    pianoActivity.getSymbolContainer().get(0).setMarked(true);
+                    solo.clickLongOnView(pianoActivity.getNoteSheetView());
 
-                        solo.sleep(1000);
+                    solo.sleep(1000);
 
-                        solo.clickOnButton(PIANO_BUTTON_TEXT);
+                    solo.clickOnButton(PIANO_BUTTON_TEXT);
 
-                        assertEquals(1, pianoActivity.getSymbolContainer().size());
-                        assertTrue(pianoActivity.getSymbolContainer().get(0).isMarked());
-                    }
+                    assertEquals(1, pianoActivity.getSymbolContainer().size());
+                    assertTrue(pianoActivity.getSymbolContainer().get(0).isMarked());
+                }
 
-                    public void testClickOctaveDownButton() {
-                        solo.clickOnButton(getActivity().getString(R.string.minus));
+                public void testClickOctaveDownButton() {
+                    solo.clickOnButton(getActivity().getString(R.string.minus));
 
-                        solo.sleep(1000);
+                    solo.sleep(1000);
 
-                        assertEquals(Octave.DEFAULT_OCTAVE.previous(), pianoActivity.getOctave());
-                        assertEquals(pianoActivity.getNoteSheetViewFragment().getOctaveText(), getActivity().getString(R.string.octave) + " " + (-1));
-                    }
+                    assertEquals(Octave.DEFAULT_OCTAVE.previous(), pianoActivity.getOctave());
+                    assertEquals(pianoActivity.getNoteSheetViewFragment().getOctaveText(), getActivity().getString(R.string.octave) + " " + (-1));
+                }
 
-                    public void testClickOctaveUpButton() {
-                        solo.clickOnButton(getActivity().getString(R.string.plus));
+                public void testClickOctaveUpButton() {
+                    solo.clickOnButton(getActivity().getString(R.string.plus));
 
-                        solo.sleep(1000);
+                    solo.sleep(1000);
 
-                        assertEquals(Octave.DEFAULT_OCTAVE.next(), pianoActivity.getOctave());
-                        assertEquals(pianoActivity.getNoteSheetViewFragment().getOctaveText(), getActivity().getString(R.string.octave) + " " + (1));
-                    }
-                */
+                    assertEquals(Octave.DEFAULT_OCTAVE.next(), pianoActivity.getOctave());
+                    assertEquals(pianoActivity.getNoteSheetViewFragment().getOctaveText(), getActivity().getString(R.string.octave) + " " + (1));
+                }
+            */
     public void testEditModeReplaceAddAccord() throws Throwable {
         NoteName[] noteNames = new NoteName[2];
         noteNames[0] = NoteName.C4;
         noteNames[1] = NoteName.D4;
 
+        long startFirstNote = 0;
+        long endFirstNote = 60;
+        long startAccordFirstNote = 0;
+        long startAccordSecondNote = 0;
+        long endAccordFirstNote = 60;
+        long endAccordSecondNote = 60;
+        long[] currentTimeMillis = {startFirstNote, endFirstNote,
+                startAccordFirstNote, startAccordSecondNote,
+                endAccordFirstNote, endAccordSecondNote};
+        pianoActivity.initializeTickProvider(currentTimeMillis);
+
         addNoteToNoteSheet(noteNames[0]);
         enterEditModeWithOneMarkedSymbol(0);
-
         addAccordToNoteSheet(noteNames);
 
         assertEquals(1, pianoActivity.getSymbolContainer().size());

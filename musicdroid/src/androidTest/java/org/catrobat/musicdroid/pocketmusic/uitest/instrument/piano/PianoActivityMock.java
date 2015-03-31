@@ -25,10 +25,13 @@ package org.catrobat.musicdroid.pocketmusic.uitest.instrument.piano;
 
 import android.os.Bundle;
 
+import org.catrobat.musicdroid.pocketmusic.instrument.noteSheet.NoteSheetViewFragment;
 import org.catrobat.musicdroid.pocketmusic.instrument.piano.PianoActivity;
 import org.catrobat.musicdroid.pocketmusic.instrument.piano.PianoViewFragment;
 import org.catrobat.musicdroid.pocketmusic.note.MusicalInstrument;
 import org.catrobat.musicdroid.pocketmusic.note.MusicalKey;
+import org.catrobat.musicdroid.pocketmusic.note.Project;
+import org.catrobat.musicdroid.pocketmusic.test.instrument.TickProviderMock;
 
 
 public class PianoActivityMock extends PianoActivity {
@@ -44,8 +47,20 @@ public class PianoActivityMock extends PianoActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       // noteSheetViewFragment = new NoteSheetViewFragmentMock();
     }
-/*
+
+    @Override
+    protected void onActionClear(){
+        super.onActionClear();
+    }
+
+    public void initializeTickProvider(long[] currentTimeMillis){
+        tickProvider = new TickProviderMock(Project.DEFAULT_BEATS_PER_MINUTE, currentTimeMillis);
+    }
+
+
+    /*
         public NoteSheetView getNoteSheetView() {
             return noteSheetViewFragment.getNoteSheetView();
         }

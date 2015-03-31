@@ -33,9 +33,6 @@ import android.graphics.RectF;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * Created by Daniel on 21.10.2014.
- */
 public class CanvasMock extends Canvas {
 
     public static final int HEIGHT = 1000;

@@ -67,9 +67,9 @@ public abstract class InstrumentActivity extends Activity {
     private int beatsPerMinute;
     private MidiPlayer midiPlayer;
     private Project project;
-    private SymbolContainer symbolContainer;
+    protected SymbolContainer symbolContainer;
     private NoteEventsToSymbolsConverter noteEventsConverter;
-    private TickProvider tickProvider;
+    protected TickProvider tickProvider;
 
     private boolean activityInFocus = false;
 
@@ -223,7 +223,7 @@ public abstract class InstrumentActivity extends Activity {
         }
     }
 
-    private void onActionClear() {
+    protected void onActionClear() {
         symbolContainer.clear();
         redraw();
 

@@ -42,7 +42,7 @@ public class PianoActivity extends InstrumentActivity {
     private static final String SAVED_INSTANCE_PIANO_VISIBLE = "pianoVisible";
 
     private PianoViewFragment pianoViewFragment;
-    private NoteSheetViewFragment noteSheetViewFragment;
+    protected NoteSheetViewFragment noteSheetViewFragment;
     private AdditionalSettingsFragment additionalSettingsFragment;
     private BreakViewFragment breakViewFragment;
 

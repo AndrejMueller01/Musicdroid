@@ -74,24 +74,4 @@ public class TickProviderTest extends AndroidTestCase {
 
         assertEquals(expectedTick, tickProvider.getTick());
     }
-
-    private class TickProviderMock extends TickProvider {
-
-        private long[] currentTimeMillis;
-        private int index;
-
-        public TickProviderMock(int beatsPerMinute, long... currentTimeMillis) {
-            super(beatsPerMinute);
-            this.currentTimeMillis = currentTimeMillis;
-            index = 0;
-        }
-
-        @Override
-        protected long currentTimeMillis() {
-            long result = currentTimeMillis[index];
-            index++;
-
-            return result;
-        }
-    }
 }
