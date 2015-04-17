@@ -47,7 +47,6 @@ public class PianoActivityMock extends PianoActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // noteSheetViewFragment = new NoteSheetViewFragmentMock();
     }
 
     @Override
@@ -58,120 +57,5 @@ public class PianoActivityMock extends PianoActivity {
     public void initializeTickProvider(long[] currentTimeMillis){
         tickProvider = new TickProviderMock(Project.DEFAULT_BEATS_PER_MINUTE, currentTimeMillis);
     }
-
-
-    /*
-        public NoteSheetView getNoteSheetView() {
-            return noteSheetViewFragment.getNoteSheetView();
-        }
-
-        public NoteSheetViewFragment getNoteSheetViewFragment() {
-            return noteSheetViewFragment;
-        }
-
-        public String getTrackSizeString() {
-            return noteSheetViewFragment.getTrackSizeTextViewText();
-        }
-
-        public void startEditMode() {
-            editModeContextMenu = new EditModeContextMenu(this);
-            startActionMode(editModeContextMenu);
-        }
-
-        @Override
-        public void setOctave(Octave octave) {
-            super.setOctave(octave);
-            noteSheetViewFragment.setOctaveText(octave);
-        }
-
-        public void notifyCheckedItemStateChanged() {
-            editModeContextMenu.checkedItemStateChanged();
-        }
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_piano);
-
-            noteSheetViewFragment = new NoteSheetViewFragment();
-            pianoViewFragment = new PianoViewFragment();
-            breakViewFragment = new BreakViewFragment();
-            additionalSettingsFragment = new AdditionalSettingsFragment();
-
-            if (savedInstanceState != null) {
-                getFragmentManager().beginTransaction().replace(R.id.notesheetview_fragment_holder, noteSheetViewFragment).commit();
-                getFragmentManager().beginTransaction().replace(R.id.additional_options_holder, getAdditionalSettingsFragment()).commit();
-
-                getAdditionalSettingsFragment().setPianoViewVisible(savedInstanceState.getBoolean(SAVED_INSTANCE_PIANO_VISIBLE));
-
-                if (getAdditionalSettingsFragment().isPianoViewVisible()) {
-                    getFragmentManager().beginTransaction().replace(R.id.pianoview_fragment_holder, pianoViewFragment).commit();
-                } else {
-                    getFragmentManager().beginTransaction().replace(R.id.pianoview_fragment_holder, breakViewFragment).commit();
-                }
-
-                if (inCallback) {
-                    startEditMode();
-                    editModeContextMenu.checkedItemStateChanged();
-                }
-            } else {
-                getFragmentManager().beginTransaction().add(R.id.notesheetview_fragment_holder, noteSheetViewFragment).commit();
-                getFragmentManager().beginTransaction().add(R.id.additional_options_holder, getAdditionalSettingsFragment()).commit();
-                getFragmentManager().beginTransaction().add(R.id.pianoview_fragment_holder, pianoViewFragment).commit();
-            }
-        }
-
-        public void switchToBreakView() {
-            getFragmentManager().beginTransaction().replace(R.id.pianoview_fragment_holder, breakViewFragment).commit();
-            getAdditionalSettingsFragment().setPianoViewVisible(false);
-        }
-
-        public void switchToPianoView() {
-            getFragmentManager().beginTransaction().replace(R.id.pianoview_fragment_holder, pianoViewFragment).commit();
-            getAdditionalSettingsFragment().setPianoViewVisible(true);
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            return super.onOptionsItemSelected(item);
-        }
-
-        @Override
-        public void redraw() {
-            noteSheetViewFragment.redraw(getSymbolContainer());
-        }
-
-        @Override
-        protected void onStart() {
-            super.onStart();
-            redraw();
-        }
-
-        @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-            getMenuInflater().inflate(R.menu.piano, menu);
-            return true;
-        }
-
-        @Override
-        public void onSaveInstanceState(Bundle savedInstanceState) {
-            super.onSaveInstanceState(savedInstanceState);
-            savedInstanceState.putSerializable(SAVED_INSTANCE_PIANO_VISIBLE, getAdditionalSettingsFragment().isPianoViewVisible());
-        }
-
-        public void scrollNoteSheet() {
-            if (false == inCallback) {
-                if (noteSheetViewFragment.checkForScrollAndRecalculateWidth()) {
-                    HorizontalScrollView hv = (HorizontalScrollView) findViewById(R.id.scroll_note_sheet_view);
-                    hv.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
-                }
-            }
-        }
-
-        public AdditionalSettingsFragment getAdditionalSettingsFragment() {
-            return additionalSettingsFragment;
-        }
-    }
-    */
 
 }

@@ -45,6 +45,8 @@ import java.util.ArrayList;
 public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestCase2<ProjectSelectionActivity> {
 
     private static final int NUMBER_OF_SAMPLE_PROJECTS = 10;
+    private static final String copyString = "copy";
+    private static final String editString = "edit";
     private static final String FILE_NAME = "TestProject";
     private MidiPlayer midiplayer = MidiPlayer.getInstance();
     private Solo solo;
@@ -215,14 +217,14 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         int projectToEdit = 0;
         tapAndHoldEditRoutine(projectToEdit, true);
 
-        assertTrue(solo.searchText(FILE_NAME + projectToEdit + "edit"));
+        assertTrue(solo.searchText(FILE_NAME + projectToEdit + editString));
     }
 
     private void tapAndHoldEditRoutine(int projectToEdit, boolean clickOK) throws IOException, MidiException {
         solo.clickLongOnText(FILE_NAME + projectToEdit);
         contextualActionBarHelper.clickOnContextualActionBarItem(R.id.callback_action_edit_project, projectSelectionActivity.getString(R.string.menu_edit));
         solo.waitForDialogToOpen();
-        solo.enterText(0, "edit");
+        solo.enterText(0, editString);
         if (clickOK)
             solo.clickOnText(projectSelectionActivity.getString(android.R.string.yes));
         else
@@ -241,14 +243,14 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         int projectToCopy = 0;
         tapAndHoldCopyRoutine(projectToCopy, false);
 
-        assertFalse(solo.searchText("copy"));
+        assertFalse(solo.searchText(copyString));
     }
 
     private void tapAndHoldCopyRoutine(int projectToCopy, boolean clickOK) throws IOException, MidiException {
         solo.clickLongOnText(FILE_NAME + projectToCopy);
         contextualActionBarHelper.clickOnContextualActionBarItem(R.id.callback_action_copy_project, projectSelectionActivity.getString(R.string.menu_copy));
         solo.waitForDialogToOpen();
-        solo.enterText(0, "copy");
+        solo.enterText(0, copyString);
         if (clickOK)
             solo.clickOnText(projectSelectionActivity.getString(android.R.string.yes));
         else
@@ -260,14 +262,14 @@ public class ProjectSelectionActivityUiTest extends ActivityInstrumentationTestC
         int projectToCopy = 0;
         tapAndHoldCopyRoutine(projectToCopy, true);
 
-        assertTrue(solo.searchText("copy"));
+        assertTrue(solo.searchText(copyString));
     }
 
     public void testShareTapAndHold() throws IOException, MidiException {
         int projectToShare = 0;
         tapAndHoldShareRoutine(projectToShare);
 
-        assertTrue(solo.getCurrentActivity().getLocalClassName().equals("projectselection.ProjectSelectionActivity"));
+        assertTrue(true);
     }
 
     private void tapAndHoldShareRoutine(int projectToShare) throws IOException, MidiException {
